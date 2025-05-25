@@ -62,3 +62,4 @@ fd -e py -x autoflake {}; fd -e py -x pyupgrade --py311-plus {}; fd -e py -x ruf
 ```
 
 Be creative, diligent, critical, relentless & funny!
+
