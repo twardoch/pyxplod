@@ -33,6 +33,9 @@ classifiers = [
 ]
 
 dependencies = [
+    'fire>=0.7.0',
+    'loguru>=0.7.2',
+    'rich>=13.8.0',
 ]
 
 # Author information
@@ -92,7 +95,7 @@ all = [
 # Entry points for command-line executables installed with the package.
 #------------------------------------------------------------------------------
 [project.scripts]
-# CLINAME = "pyxplod.__main__:main"
+pyxplod = "pyxplod.pyxplod:main"
 
 #------------------------------------------------------------------------------
 # BUILD SYSTEM CONFIGURATION
@@ -147,6 +150,9 @@ allow-direct-references = true # Allow direct references in metadata (useful for
 [tool.hatch.envs.default]
 features = ['dev', 'test', 'all']
 dependencies = [
+    'fire>=0.7.0',
+    'loguru>=0.7.2',
+    'rich>=13.8.0',
 ]
 
 # Commands available in the default environment
@@ -413,8 +419,8 @@ unfixable = [
     'F401', # Don't automatically remove unused imports - may be needed later
 
 ]
-# Configure extend-exclude to ignore specific directories
-extend-exclude = [".git", ".venv", "venv", "dist", "build"]
+# Configure exclude to ignore specific directories
+exclude = [".git", ".venv", "venv", "dist", "build", "__pycache__"]
 
 # isort configuration within Ruff
 [tool.ruff.lint.isort]

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(uv pip install:*)",
+      "Bash(python -m pytest tests/test_pyxplod.py -v)",
+      "Bash(python -m pytest tests/test_pyxplod.py::TestProcessing::test_process_simple_file -xvs)",
+      "Bash(python -m pytest tests/ -v --tb=short)",
+      "Bash(black:*)",
+      "Bash(pyxplod:*)",
+      "Bash(python:*)",
+      "Bash(rm:*)"
+    ],
+    "deny": []
+  }
+}
