@@ -64,7 +64,7 @@ fd -e py -x autoflake {}; fd -e py -x pyupgrade --py311-plus {}; fd -e py -x ruf
 Be creative, diligent, critical, relentless & funny!
 START SPECIFICATION:
 ---
-description: Apply this overview documentation when analyzing intelligent video overlay and synchronization tools that handle precise temporal and spatial alignment of video content
+description: Create overview documentation when analyzing unique business logic in video processing tools, particularly those focused on intelligent video overlay and synchronization with advanced frame alignment capabilities
 globs: *.py,*.md
 alwaysApply: false
 ---
@@ -81,55 +81,54 @@ alwaysApply: false
 - Explain your OBSERVATIONS clearly, then provide REASONING to identify the exact issue. Add console logs when needed to gather more information.
 
 
-## Core Business Logic Overview
+## Core Business Components
 
-`vidkompy` is an intelligent video synchronization system focused on precise overlay and alignment of foreground videos onto background videos. The system's core business logic prioritizes foreground video integrity while dynamically adapting background content.
+### Frame Alignment Engine (Importance: 95)
+Handles the critical synchronization between foreground and background videos using:
 
-### Video Processing Logic
+1. **Perceptual Frame Fingerprinting**
+- Creates unique fingerprints for video frames using multiple hash algorithms
+- Combines pHash, AverageHash, ColorMomentHash and MarrHildrethHash 
+- Enables ultra-fast frame comparison without pixel-level analysis
 
-1. **Frame Fingerprinting System**
-- Generates compact perceptual hashes for efficient frame comparison
-- Multi-algorithm approach combining pHash, AverageHash, ColorMomentHash, and MarrHildrethHash
-- Weighted similarity calculations based on hash reliability for video content
+2. **Spatial Alignment System**
+- Determines optimal x/y positioning of foreground video
+- Uses template matching with normalized cross-correlation
+- Handles automatic scaling when source sizes differ
 
-2. **Temporal Alignment Engine**
-- Dynamic Time Warping (DTW) implementation for frame-to-frame mapping
-- Monotonic path constraints to prevent temporal inconsistencies
-- Frame interpolation system for continuous playback timing
+3. **Temporal Synchronization**  
+- Implements Dynamic Time Warping for frame-perfect alignment
+- Creates monotonic mapping between foreground and background frames
+- Prevents temporal drift through adaptive keyframe density
 
-3. **Spatial Alignment Logic**
-- Template matching for optimal foreground positioning
-- Automatic scaling and offset calculation
-- Border detection for edge-based alignment
+### Video Composition Pipeline (Importance: 90)
 
-### Domain-Specific Processing
+1. **Video Analysis Phase**
+- Extracts metadata from both video sources
+- Determines frame rates, durations, resolutions
+- Identifies available audio streams
 
-1. **Video Stream Composition**
-- Sequential frame reading optimization
-- Foreground-priority frame preservation
-- Dynamic background frame adaptation
+2. **Frame Matching Algorithm**  
+- Maps every foreground frame to optimal background frame
+- Maintains foreground timing integrity
+- Dynamically adapts background video timing
 
-2. **Audio Integration**
-- Intelligent audio source selection
-- Temporal synchronization with composed video
-- Fallback mechanism for missing audio tracks
+3. **Audio Integration System**
+- Prioritizes foreground audio when available
+- Ensures synchronized audio/video alignment
+- Handles fallback to background audio
 
-### Business Rules
+### Operation Modes (Importance: 85)
 
-1. **Foreground Preservation**
-- All foreground frames must be included without modification
-- Original foreground timing must be maintained
-- No re-timing or quality reduction of foreground content
+1. **Border Matching Mode**
+- Aligns content based on visible background edges
+- Uses configurable margin thickness
+- Optimizes edge detection for alignment
 
-2. **Background Adaptation**
-- Dynamic stretching and compression to match foreground timing
-- Selective frame sampling based on alignment requirements
-- Resolution matching while maintaining aspect ratios
-
-3. **Quality Assurance**
-- Prevention of temporal drift through keyframe density calculation
-- Edge case handling for resolution and framerate mismatches
-- Graceful degradation for imperfect matches
+2. **Smooth Blending Mode** 
+- Creates seamless visual transitions
+- Handles frame edge integration
+- Preserves content integrity during blending
 
 $END$
 END SPECIFICATION

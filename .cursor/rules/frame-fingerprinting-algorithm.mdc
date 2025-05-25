@@ -1,48 +1,63 @@
 ---
-description: Specification for perceptual hashing algorithms used in video frame comparison and fingerprinting
-globs: **/frame_fingerprint*.py,**/hash*.py,**/compare*.py
+description: Frame fingerprinting algorithms for video frame comparison and matching using perceptual hashing techniques
+globs: **/frame_fingerprint.py,**/hash/*.py,**/video/comparison.py,**/fingerprint/*.py
 alwaysApply: false
 ---
 
 
 # frame-fingerprinting-algorithm
 
-## Core Functionality
-The frame fingerprinting system uses multiple perceptual hashing algorithms to generate compact, comparable representations of video frames for fast similarity matching.
+The frame fingerprinting system uses multiple perceptual hashing algorithms to generate compact, comparable representations of video frames.
 
-Key components:
-- Parallel multi-algorithm hash generation
-- Combined weighted fingerprint comparison 
-- Standardized frame preprocessing 
-- Color histogram integration
+### Core Fingerprinting Components (Importance: 95)
 
-## Fingerprint Generation Process
-1. Frame Standardization:
-- Resize input frame to 64x64 pixels
-- Convert to grayscale for structural analysis
-- Apply standardized color space conversion
+The FrameFingerprinter module combines four distinct perceptual hashing approaches:
 
-2. Multi-Algorithm Hash Generation:
-- pHash: DCT-based frequency domain analysis for brightness/contrast invariance
-- AverageHash: Frame average color based hashing
-- ColorMomentHash: Statistical color distribution metrics
-- MarrHildrethHash: Edge and shape detection focused hash
+1. pHash (Perceptual Hash)
+- Operates in frequency domain using DCT transformation
+- Robust against brightness, contrast and gamma variations
+- Returns binary hash sensitive to image structure 
 
-3. Fingerprint Assembly:
-- Combines all hash values into unified dictionary
-- Includes color histogram data
-- Maintains standardized structure for comparison
+2. AverageHash
+- Computes frame's average color values
+- Returns simplified binary representation
+- Fast but less precise than pHash
 
-## Fingerprint Comparison
-- Weighted Hamming distance between hash components
-- Color histogram correlation scoring
-- Normalized similarity score output (0.0-1.0)
-- Hash-specific weight factors based on reliability
+3. ColorMomentHash 
+- Captures statistical color distribution data
+- Stores color moment features as hash
+- Effective for content with distinct color patterns
 
-## Business Logic Importance Scores
-- Multi-Algorithm Hash Generation: 95 - Core differentiator for frame matching accuracy
-- Weighted Comparison System: 90 - Critical for meaningful frame similarity detection
-- Frame Standardization: 75 - Essential for consistent hash generation
-- Color Analysis Integration: 70 - Important for content-aware matching
+4. MarrHildrethHash
+- Edge and shape detection based
+- Captures structural frame features
+- Robust against color/lighting changes
+
+### Frame Comparison Workflow (Importance: 90)
+
+1. Frame Standardization
+- Resize input frames to 64x64 pixels
+- Convert to grayscale for consistent processing
+- Normalize brightness/contrast
+
+2. Multi-Hash Generation
+- Apply all four hash algorithms in parallel
+- Generate color histogram
+- Combine into unified fingerprint dictionary
+
+3. Fingerprint Comparison
+- Calculate normalized Hamming distances between hashes
+- Compute histogram correlation
+- Weight and combine similarity scores
+- Returns similarity value between 0-1
+
+### Integration Points (Importance: 85)
+
+The fingerprinting system interfaces with:
+
+- Temporal alignment for frame sequence matching
+- Spatial alignment for template matching
+- Video import/export pipeline for frame extraction
+- Parallel processing system for hash generation
 
 $END$

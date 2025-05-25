@@ -1,64 +1,54 @@
 ---
-description: Specifies Dynamic Time Warping implementation for temporal video synchronization and frame alignment.
-globs: **/temporal_alignment.py,**/dtw/*.py,**/frame_sync/*.py,**/video_align/*.py
+description: Specification for implementing temporal alignment between videos using Dynamic Time Warping (DTW) algorithms
+globs: **/temporal/*.py,**/alignment/*.py,**/dtw/*.py,**/sync/*.py
 alwaysApply: false
 ---
 
 
 # temporal-alignment-dtw
 
-## Core Functionality
-The Dynamic Time Warping (DTW) implementation provides intelligent temporal alignment between foreground and background videos, ensuring frame-perfect synchronization while preserving the foreground video's timing integrity.
+The temporal alignment system uses Dynamic Time Warping (DTW) to synchronize foreground and background videos with different timings and frame rates.
 
-### Frame Mapping Process
-1. Frame Fingerprinting:
-- Generates compact perceptual hashes for each video frame
-- Combines multiple hash types (pHash, AverageHash, ColorMomentHash, MarrHildrethHash)
-- Creates a unified fingerprint dictionary per frame
+## Core Business Logic
 
-2. Cost Matrix Construction:
-- Builds similarity matrix between all frame pairs
-- Cost(i,j) = 1.0 - similarity between foreground frame i and background frame j
-- Enforces monotonicity constraint to prevent temporal jumps
-- Implements Sakoe-Chiba band constraint to limit warping
+### DTW Frame Alignment
+- Creates frame-to-frame mapping between foreground and background videos
+- Constructs cost matrix representing similarity between all possible frame pairs 
+- Applies monotonicity constraint to prevent backwards time jumps
+- Uses Sakoe-Chiba band windowing to constrain warping path
+- Generates continuous alignment map through interpolation between key frames
 
-3. Path Optimization:
-- Finds lowest-cost path through similarity matrix 
-- Ensures one-to-one frame mapping
-- Generates continuous mapping through linear interpolation
-- Creates FrameAlignment(fg_frame_idx, bg_frame_idx) for each foreground frame
+### Frame Fingerprinting
+- Standardizes frames to uniform size/grayscale for comparison
+- Implements multi-algorithm perceptual hashing:
+  - pHash (DCT frequency analysis)
+  - AverageHash (mean color values)
+  - ColorMomentHash (color distribution) 
+  - MarrHildrethHash (edge detection)
+- Combines hashes with color histograms into unified fingerprint
 
-### Business Logic Importance Scores
+### Temporal Synchronization Flow
+1. Sample frames from both videos at varying densities
+2. Generate fingerprints for sampled frames
+3. Build frame similarity cost matrix
+4. Find optimal DTW path through cost matrix
+5. Interpolate full frame mapping from sparse matches
 
-- Frame Matching Algorithm: 95
-  - Critical for maintaining synchronization
-  - Core differentiator for video alignment quality
+### Drift Prevention 
+- Adaptive keyframe sampling based on FPS differences
+- Maintains consistent sync without accumulating temporal drift
+- Preserves foreground timing while warping background
 
-- Path Optimization: 90
-  - Ensures globally optimal frame mapping
-  - Prevents drift and temporal artifacts
+### Video Composition
+- Uses frame mapping to fetch correct background frames
+- Ensures sequential frame reading for performance
+- Maintains perfect frame-level synchronization
 
-- Frame Fingerprinting: 85
-  - Enables efficient frame comparison
-  - Multi-hash approach improves matching accuracy
-
-### Domain-Specific Requirements
-
-1. Foreground Timing Preservation:
-- Must maintain exact timing of foreground video
-- Background video timing adapts to match foreground frames
-- No frame dropping or duplication in foreground content
-
-2. Continuous Synchronization:
-- Prevents temporal drift between videos
-- Ensures consistent alignment across entire duration
-- Handles varying frame rates and durations
-
-3. Monotonic Alignment:
-- Forward-only frame progression
-- No backward jumps in either video stream
-- Preserves temporal causality
-
-The temporal alignment system forms the foundation for accurate video overlay composition, ensuring that content remains perfectly synchronized regardless of input video characteristics or timing differences.
+Importance Scores:
+- DTW Frame Alignment: 95 (Core synchronization algorithm)
+- Frame Fingerprinting: 90 (Critical for frame matching)
+- Temporal Flow: 85 (Key workflow orchestration)
+- Drift Prevention: 80 (Essential quality control)
+- Video Composition: 75 (Integration of aligned content)
 
 $END$

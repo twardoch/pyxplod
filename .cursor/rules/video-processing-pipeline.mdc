@@ -1,77 +1,59 @@
 ---
-description: Documents video processing pipeline stages, frame handling, and composition logic for overlaying foreground video onto background video
-globs: **/*.py,**/video/*.py,**/pipeline/*.py
+description: Technical specification for video frame processing, synchronization and composition pipeline
+globs: src/vidkompy/pipeline/**/*.py,src/vidkompy/core/*.py,src/vidkompy/sync/**/*.py
 alwaysApply: false
 ---
 
 
 # video-processing-pipeline
 
-The video processing pipeline implements intelligent overlay and synchronization of foreground video onto background video through several distinct stages:
+## Frame Processing Pipeline (Importance: 95)
+The pipeline follows a "foreground-first" principle to preserve content integrity:
 
-## Core Pipeline Stages
+1. Frame Extraction & Fingerprinting
+- Generates perceptual hashes and color histograms for each frame
+- Multiple hash types combined for robust frame matching
+- Parallel processing across CPU cores for fingerprint generation
 
-1. **Video Analysis & Metadata Extraction**
-- Probes input videos using ffprobe to gather resolution, FPS, duration, frame count
-- Analyzes audio stream information and determines primary audio source
-- Importance Score: 75
+2. Spatial Alignment
+- Template matching using normalized cross-correlation
+- Determines optimal (x,y) offset for foreground overlay
+- Handles automatic scaling if foreground exceeds background dimensions
 
-2. **Spatial Alignment Stage**
-- Extracts representative frames from video midpoints
-- Uses template matching to determine optimal (x,y) overlay position
-- Handles resolution mismatches through intelligent scaling
-- Importance Score: 85
+3. Temporal Synchronization
+- Dynamic Time Warping (DTW) creates frame-to-frame mapping
+- Enforces monotonicity to prevent timeline jumps
+- Interpolates between key matches for smooth transitions
 
-3. **Temporal Frame Mapping** 
-- Generates frame fingerprints using perceptual hashing
-- Creates frame alignment map using Dynamic Time Warping (DTW)
-- Ensures foreground frames are preserved without modification
-- Dynamically warps background video timing to match foreground
-- Importance Score: 95
+4. Video Composition
+- Sequential frame reading for optimized I/O
+- Background frames dynamically matched to foreground timeline
+- Optional smooth blending at frame edges
 
-4. **Video Composition Process**
-- Sequential frame reading from both video streams
-- Overlays foreground frames at computed spatial position
-- Applies frame blending when smooth mode is enabled
-- Importance Score: 90
+## Frame Mapping System (Importance: 90)
+Core algorithm for maintaining perfect synchronization:
 
-5. **Audio Integration**
+1. FrameAlignment Structure
+- Maps each foreground frame index to corresponding background frame
+- Handles framerate mismatches through interpolation
+- Maintains global temporal coherence
+
+2. Frame Selection Logic
+- Samples more frames from background for flexible matching
+- Uses mid-point frame selection for spatial alignment
+- Adaptive keyframe density based on FPS differences
+
+## Audio Integration (Importance: 85)
+Intelligent audio handling process:
+
+1. Source Selection
 - Prioritizes foreground audio track when available
-- Synchronizes audio timing with composed video
 - Falls back to background audio if needed
-- Importance Score: 80
+- Validates audio stream compatibility
 
-## Key Business Rules
-
-1. **Foreground Preservation**
-- All foreground frames must be included without modification
-- Background video timing adapts to match foreground frames
-- Importance Score: 95
-
-2. **Synchronization Requirements** 
-- Must prevent temporal drift between videos
-- Alignment must be monotonic (no backwards time jumps)
-- Frame mapping must be continuous and smooth
-- Importance Score: 90
-
-3. **Quality Assurance**
-- Validates frame alignment confidence scores
-- Ensures spatial matching exceeds minimum correlation threshold
-- Verifies audio sync within acceptable tolerance
-- Importance Score: 85
-
-## Domain-Specific Components
-
-1. **Frame Fingerprinting System**
-- Combines multiple perceptual hash algorithms
-- Normalized Hamming distance for fingerprint comparison
-- Weighted scoring based on hash type reliability
-- Importance Score: 90
-
-2. **DTW-based Temporal Alignment**
-- Cost matrix represents frame pair similarity scores
-- Path constraints prevent unrealistic warping
-- Interpolates between key frame matches
-- Importance Score: 95
+2. Synchronization
+- Applies temporal offset matching video alignment
+- Ensures perfect audio/video sync in final output
+- Handles different audio formats and sample rates
 
 $END$
