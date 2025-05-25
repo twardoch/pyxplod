@@ -9,8 +9,16 @@ def process_python_file_dirs(input_file: Path, output_base: Path, input_root: Pa
 
     Creates a directory for each .py file and extracts definitions into separate files
     within that directory, with an __init__.py containing imports and module-level code.
+
+    Special files like __init__.py, __main__.py, __version__.py are processed using
+    the files method instead of creating directories.
     """
     logger.info(f"Processing (dirs): {input_file}")
+    filename = input_file.name
+    if filename.startswith("__") and filename.endswith("__.py"):
+        logger.debug(f"Special file detected, using files method: {filename}")
+        process_python_file(input_file, output_base, input_root)
+        return
     relative_path = input_file.relative_to(input_root)
     dir_name = relative_path.stem
     output_dir = output_base / relative_path.parent / dir_name

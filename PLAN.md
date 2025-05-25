@@ -1,112 +1,111 @@
 # PLAN.md
 
-## Alternative Implementation: --method dirs
+## Critical Scope Resolution Issue (URGENT)
 
-### Overview
-The `--method dirs` option provides an alternative way to explode Python files. Instead of creating separate files in the same directory (default `--method files` behavior), this method creates a subfolder for each Python file and organizes the extracted code differently.
+**Problem**: When extracting functions/classes with the `dirs` method, module-level variables are not included in extracted files, causing `NameError` in the extracted code.
 
-### Specification for --method dirs
-
-When using `--method dirs`, pyxplod will:
-
-1. **Convert each .py file to a directory** with the same name (without .py extension)
-2. **Extract each class and function** into separate .py files within that directory
-3. **Create an `__init__.py`** containing:
-   - All module-level imports from the original file
-   - Imports for all extracted classes/functions
-   - Any remaining module-level code (constants, module variables, etc.)
-
-### Example Transformation (--method dirs)
-
-Input: `src/utils.py`
+**Example**:
 ```python
-import os
-from typing import List
-
-CONSTANT = "value"
-
-class MyClass:
-    def method(self):
-        pass
+# Original file
+from rich.console import Console
+console = Console()
 
 def my_function():
-    pass
-
-# Module-level code
-print("Module loaded")
+    console.print("Hello")  # 'console' undefined in extracted file
 ```
 
-Output structure:
-```
-output/
-└── src/
-    └── utils/
-        ├── __init__.py
-        ├── my_class.py
-        └── my_function.py
-```
+**Solution Strategy**:
+1. **Detect Module-Level Variables**: Identify assignments like `console = Console()` at module level
+2. **Analyze Dependencies**: Check which extracted definitions reference these variables
+3. **Include Required Variables**: Copy necessary module-level assignments to extracted files
+4. **Maintain Import Order**: Ensure variables come after their required imports
 
-**output/src/utils/__init__.py:**
-```python
-import os
-from typing import List
+**Implementation Plan**:
+- [x] Add `find_module_variables()` function to detect module-level assignments
+- [x] Enhance `analyze_name_usage()` to distinguish between imported names and module variables
+- [x] Update `write_extracted_file()` to include required module variables
+- [x] Apply fix to both `files` and `dirs` methods
+- [x] Test with rich.console example from TODO.md
 
-from .my_class import MyClass
-from .my_function import my_function
+**Status**: ✅ **COMPLETED** - Scope resolution implemented and tested successfully.
 
-CONSTANT = "value"
+## Sprint 2
 
-# Module-level code
-print("Module loaded")
-```
+### Code Quality & Preservation Issues
+- [ ] **Fix code element preservation** (HIGH PRIORITY)
+  - [ ] Maintain decorators on extracted functions/classes (@property, @staticmethod, etc.)
+  - [ ] Preserve docstrings in correct positions (before or after imports)
+  - [ ] Handle comments between definitions (currently lost during AST processing)
+  - [ ] Ensure type annotations are preserved exactly
 
-**output/src/utils/my_class.py:**
-```python
-import os
-from typing import List
+### Error Handling & Robustness  
+- [ ] **Improve error handling and Unicode support**
+  - [ ] Add proper Unicode/encoding support (UTF-8, other encodings)
+  - [ ] Implement partial file processing on syntax errors
+  - [ ] Better error messages with file names and line numbers
+  - [ ] Add `--skip-errors` flag to continue processing despite errors
 
-class MyClass:
-    def method(self):
-        pass
-```
+## Next Sprint - Architecture & Features (v0.5.0)
 
-**output/src/utils/my_function.py:**
-```python
-import os
-from typing import List
+### Code Architecture
+- [ ] **Refactor monolithic pyxplod.py** (currently 450+ lines)
+  - [ ] Extract `ast_utils.py` - AST manipulation and analysis functions
+  - [ ] Extract `file_utils.py` - File discovery, I/O, and path operations
+  - [ ] Extract `processors.py` - Method implementation logic (files/dirs)
+  - [ ] Extract `cli.py` - Command line interface and argument parsing
 
-def my_function():
-    pass
-```
+### Type System & Documentation
+- [ ] **Enhance type system**
+  - [ ] Add comprehensive type hints using simple syntax (list, dict, str | None)
+  - [ ] Use proper AST node types instead of generic types
+  - [ ] Add return type annotations to all functions
 
-### Implementation Details for --method dirs
+### User Experience Features
+- [ ] **Essential user features**
+  - [ ] Add `--dry-run` mode to preview changes without writing files
+  - [ ] Create `.pyxplod.toml` configuration file support
+  - [ ] Add `--exclude` patterns for skipping files/directories
+  - [ ] Add `--include-private` flag for private methods/classes
 
-1. **Directory Creation**: Each .py file becomes a package (directory with __init__.py)
-2. **Import Handling**: The __init__.py re-exports all extracted components to maintain API compatibility
-3. **Naming**: Use simple snake_case names without the original filename prefix
-4. **Compatibility**: External imports remain unchanged: `from src.utils import MyClass` still works
+## Future Backlog
 
----
+### Advanced Code Handling
+- [ ] **Complex code structures**
+  - [ ] Handle nested classes and inner functions
+  - [ ] Support async functions and async decorators
+  - [ ] Handle complex decorator chains (@property, @classmethod, @lru_cache)
+  - [ ] Support class methods, static methods, and property decorators
 
-## pyxplod Implementation Plan
+### Testing & Quality Assurance
+- [ ] **Expand test coverage**
+  - [ ] Test decorator preservation with various decorator types
+  - [ ] Test Unicode file handling with different encodings
+  - [ ] Test large file processing (>1000 lines)
+  - [ ] Test error conditions and edge cases
+  - [ ] Add integration tests with popular packages (requests, flask, django)
 
-### Overview
-`pyxplod` is a Python tool that deterministically "explodes" a Python project by extracting classes and functions into separate files and replacing them with imports.
+### Performance & Scalability
+- [ ] **Performance improvements**
+  - [ ] Implement parallel file processing for large codebases
+  - [ ] Add streaming AST processing for very large files
+  - [ ] Create incremental mode - only process changed files
+  - [ ] Add progress persistence for resumable operations
 
-### Current Implementation Status
+### Advanced Features
+- [ ] **Professional tooling features**
+  - [ ] Add `--format` flag with Black integration for code formatting
+  - [ ] Add `--verify` flag to validate output file integrity
+  - [ ] Implement reverse operation (`--method implode`) to merge files back
+  - [ ] Create plugin system for custom processing logic
 
-The core `pyxplod` functionality has been implemented with the following features:
+### Documentation & Examples
+- [ ] **Improve documentation**
+  - [ ] Add inline comments explaining complex AST operations
+  - [ ] Document import analysis and filtering logic
+  - [ ] Create examples directory with before/after transformations
+  - [ ] Add visual diagrams showing both processing methods
 
-- ✅ CLI interface using `fire` with `--input`, `--output`, `--method`, and `--verbose` flags
-- ✅ Two extraction methods: `files` (default) and `dirs`
-- ✅ Recursive Python file discovery with proper filtering
-- ✅ AST-based parsing and modification
-- ✅ Class and function extraction with snake_case naming
-- ✅ Automatic import generation and replacement
-- ✅ Import optimization - only includes imports actually used in extracted files
-- ✅ Error handling for syntax errors and edge cases
-- ✅ Progress bars and logging with `loguru` and `rich`
-- ✅ Comprehensive test suite (79% coverage)
+
 
 ### Remaining Implementation Tasks
 
