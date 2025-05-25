@@ -1,0 +1,54 @@
+---
+description: Defines template matching algorithm for spatially aligning foreground video within background frame
+globs: **/spatial_align.py,**/template_match.py,**/frame_align.py,**/video_overlay.py
+alwaysApply: false
+---
+
+
+# spatial-alignment-algorithm
+
+The spatial alignment algorithm determines the precise position for overlaying foreground video frames onto the background video using template matching techniques.
+
+## Core Algorithm (Importance: 95)
+
+1. Frame Selection Logic
+- Extracts representative frames from temporal midpoint of both videos
+- Avoids potential title sequences or black frames
+- Uses single frame comparison for efficiency while maintaining accuracy
+
+2. Template Matching Process
+- Converts frames to grayscale for alignment robustness
+- Employs cv2.matchTemplate with TM_CCOEFF_NORMED correlation method
+- Slides foreground frame across background to find optimal position
+- Returns (x_offset, y_offset) coordinates for overlay placement
+
+3. Confidence Scoring
+- Correlation score indicates match quality
+- Scores approaching 1.0 represent perfect spatial alignment
+- Used for validation of alignment results
+
+## Key Business Rules (Importance: 90)
+
+1. Automatic Scaling
+- Checks if foreground exceeds background dimensions
+- Scales down foreground while preserving aspect ratio
+- Records scale factor for consistent application
+
+2. Position Validation
+- Ensures foreground remains within background bounds
+- Prevents content clipping at frame edges
+- Maintains visual integrity of overlaid content
+
+## Frame Processing Logic (Importance: 85)
+
+1. Frame Normalization
+- Standardizes frame sizes for consistent matching
+- Converts color spaces to grayscale
+- Optimizes for template matching performance
+
+2. Match Location Analysis
+- Uses cv2.minMaxLoc to identify highest correlation position
+- Returns top-left corner coordinates for overlay
+- Provides confidence metric for match quality
+
+$END$

@@ -1,0 +1,22 @@
+[
+  {
+    "fileName": "main-overview.mdc",
+    "description": "Complete system overview of the video overlay system, including core architecture, processing pipeline, and component interactions"
+  },
+  {
+    "fileName": "frame-fingerprinting-algorithm.mdc",
+    "description": "Detailed documentation of the perceptual hashing algorithms used for frame comparison, including implementation details of pHash, AverageHash, ColorMomentHash, and MarrHildrethHash"
+  },
+  {
+    "fileName": "temporal-alignment-dtw.mdc",
+    "description": "Comprehensive documentation of the Dynamic Time Warping (DTW) implementation for temporal video alignment, including cost matrix construction and path optimization"
+  },
+  {
+    "fileName": "spatial-alignment-algorithm.mdc",
+    "description": "Technical details of the template matching algorithm used for spatial alignment, including frame selection, matching process, and scaling considerations"
+  },
+  {
+    "fileName": "video-processing-pipeline.mdc",
+    "description": "Documentation of the end-to-end video processing pipeline, including data flow between components, frame mapping, and video composition process"
+  }
+]

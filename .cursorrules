@@ -62,3 +62,74 @@ fd -e py -x autoflake {}; fd -e py -x pyupgrade --py311-plus {}; fd -e py -x ruf
 ```
 
 Be creative, diligent, critical, relentless & funny!
+START SPECIFICATION:
+---
+description: Apply this overview documentation when analyzing intelligent video overlay and synchronization tools that handle precise temporal and spatial alignment of video content
+globs: *.py,*.md
+alwaysApply: false
+---
+
+
+# main-overview
+
+## Development Guidelines
+
+- Only modify code directly relevant to the specific request. Avoid changing unrelated functionality.
+- Never replace code with placeholders like `# ... rest of the processing ...`. Always include complete code.
+- Break problems into smaller steps. Think through each step separately before implementing.
+- Always provide a complete PLAN with REASONING based on evidence from code and logs before making changes.
+- Explain your OBSERVATIONS clearly, then provide REASONING to identify the exact issue. Add console logs when needed to gather more information.
+
+
+## Core Business Logic Overview
+
+`vidkompy` is an intelligent video synchronization system focused on precise overlay and alignment of foreground videos onto background videos. The system's core business logic prioritizes foreground video integrity while dynamically adapting background content.
+
+### Video Processing Logic
+
+1. **Frame Fingerprinting System**
+- Generates compact perceptual hashes for efficient frame comparison
+- Multi-algorithm approach combining pHash, AverageHash, ColorMomentHash, and MarrHildrethHash
+- Weighted similarity calculations based on hash reliability for video content
+
+2. **Temporal Alignment Engine**
+- Dynamic Time Warping (DTW) implementation for frame-to-frame mapping
+- Monotonic path constraints to prevent temporal inconsistencies
+- Frame interpolation system for continuous playback timing
+
+3. **Spatial Alignment Logic**
+- Template matching for optimal foreground positioning
+- Automatic scaling and offset calculation
+- Border detection for edge-based alignment
+
+### Domain-Specific Processing
+
+1. **Video Stream Composition**
+- Sequential frame reading optimization
+- Foreground-priority frame preservation
+- Dynamic background frame adaptation
+
+2. **Audio Integration**
+- Intelligent audio source selection
+- Temporal synchronization with composed video
+- Fallback mechanism for missing audio tracks
+
+### Business Rules
+
+1. **Foreground Preservation**
+- All foreground frames must be included without modification
+- Original foreground timing must be maintained
+- No re-timing or quality reduction of foreground content
+
+2. **Background Adaptation**
+- Dynamic stretching and compression to match foreground timing
+- Selective frame sampling based on alignment requirements
+- Resolution matching while maintaining aspect ratios
+
+3. **Quality Assurance**
+- Prevention of temporal drift through keyframe density calculation
+- Edge case handling for resolution and framerate mismatches
+- Graceful degradation for imperfect matches
+
+$END$
+END SPECIFICATION

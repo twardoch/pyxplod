@@ -1,0 +1,64 @@
+---
+description: Specifies Dynamic Time Warping implementation for temporal video synchronization and frame alignment.
+globs: **/temporal_alignment.py,**/dtw/*.py,**/frame_sync/*.py,**/video_align/*.py
+alwaysApply: false
+---
+
+
+# temporal-alignment-dtw
+
+## Core Functionality
+The Dynamic Time Warping (DTW) implementation provides intelligent temporal alignment between foreground and background videos, ensuring frame-perfect synchronization while preserving the foreground video's timing integrity.
+
+### Frame Mapping Process
+1. Frame Fingerprinting:
+- Generates compact perceptual hashes for each video frame
+- Combines multiple hash types (pHash, AverageHash, ColorMomentHash, MarrHildrethHash)
+- Creates a unified fingerprint dictionary per frame
+
+2. Cost Matrix Construction:
+- Builds similarity matrix between all frame pairs
+- Cost(i,j) = 1.0 - similarity between foreground frame i and background frame j
+- Enforces monotonicity constraint to prevent temporal jumps
+- Implements Sakoe-Chiba band constraint to limit warping
+
+3. Path Optimization:
+- Finds lowest-cost path through similarity matrix 
+- Ensures one-to-one frame mapping
+- Generates continuous mapping through linear interpolation
+- Creates FrameAlignment(fg_frame_idx, bg_frame_idx) for each foreground frame
+
+### Business Logic Importance Scores
+
+- Frame Matching Algorithm: 95
+  - Critical for maintaining synchronization
+  - Core differentiator for video alignment quality
+
+- Path Optimization: 90
+  - Ensures globally optimal frame mapping
+  - Prevents drift and temporal artifacts
+
+- Frame Fingerprinting: 85
+  - Enables efficient frame comparison
+  - Multi-hash approach improves matching accuracy
+
+### Domain-Specific Requirements
+
+1. Foreground Timing Preservation:
+- Must maintain exact timing of foreground video
+- Background video timing adapts to match foreground frames
+- No frame dropping or duplication in foreground content
+
+2. Continuous Synchronization:
+- Prevents temporal drift between videos
+- Ensures consistent alignment across entire duration
+- Handles varying frame rates and durations
+
+3. Monotonic Alignment:
+- Forward-only frame progression
+- No backward jumps in either video stream
+- Preserves temporal causality
+
+The temporal alignment system forms the foundation for accurate video overlay composition, ensuring that content remains perfectly synchronized regardless of input video characteristics or timing differences.
+
+$END$
