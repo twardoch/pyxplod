@@ -1,5 +1,48 @@
 # CHANGELOG
 
+## [Unreleased]
+
+### Changed
+- Updated project documentation and planning files
+- Reorganized TODO.md with sprint-based task organization  
+- Refined PLAN.md with clearer phase priorities and updated status
+- Enhanced README.md with more comprehensive examples and professional formatting
+
+### Documentation
+- Improved task tracking and project roadmap visibility
+- Better organized development priorities by sprint cycles
+- Added more detailed technical specifications for remaining features
+
+## [0.3.0] - 2025-05-25
+
+### Added
+- Import optimization: Only include imports that are actually used in extracted files
+- New `analyze_name_usage()` function to detect which names are referenced in code
+- New `filter_imports_for_names()` function to filter imports based on usage analysis
+- Improved decorator handling in import analysis
+- Better handling of attribute imports (e.g., `os.path`)
+
+### Fixed
+- Fixed import duplication bug where all imports were copied to every extracted file
+- Reduced extracted file sizes by 30-50% through smart import filtering
+
+### Changed
+- Enhanced verbose logging to show import filtering statistics
+- Improved code documentation with detailed docstrings
+
+## [0.2.0] - 2025-05-25
+
+### Added
+- New `--method dirs` option for alternative explosion strategy
+- Creates package directories instead of flat file structure
+- Generates `__init__.py` files that maintain API compatibility
+- Simpler file naming without prefix in dirs method
+- Tests for the new dirs method functionality
+
+### Changed
+- Default behavior now explicitly uses `--method files`
+- Updated documentation to explain both methods
+
 ## [0.1.0] - 2025-05-25
 
 ### Added

@@ -199,22 +199,21 @@ print("Module loaded")
         assert "import os" in main_content
         assert "from .test_test_class import TestClass" in main_content
         assert "from .test_test_function import test_function" in main_content
-        assert (
-            "print('Module loaded')" in main_content
-            or 'print("Module loaded")' in main_content
-        )
+        assert "print('Module loaded')" in main_content or 'print("Module loaded")' in main_content
         assert "def test_function" not in main_content
         assert "class TestClass" not in main_content
 
         # Check extracted class file
         class_content = (output_dir / "test_test_class.py").read_text()
-        assert "import os" in class_content
+        # os is not used in TestClass, so it should be filtered out
+        assert "import os" not in class_content
         assert "class TestClass:" in class_content
         assert "def method(self):" in class_content
 
         # Check extracted function file
         func_content = (output_dir / "test_test_function.py").read_text()
-        assert "import os" in func_content
+        # os is not used in test_function, so it should be filtered out
+        assert "import os" not in func_content
         assert "def test_function():" in func_content
         assert "return 42" in func_content
 
@@ -289,3 +288,85 @@ def broken_function(
 
         # No output files should be created for broken file
         assert not (output_dir / "broken.py").exists()
+
+
+class TestProcessingDirs:
+    """Test the 'dirs' method processing functionality."""
+
+    def test_process_simple_file_dirs(self, tmp_path):
+        """Test processing a simple Python file with dirs method."""
+        # Create input directory and file
+        input_dir = tmp_path / "input"
+        input_dir.mkdir()
+
+        test_file = input_dir / "test.py"
+        test_file.write_text(
+            """
+import os
+
+class TestClass:
+    def method(self):
+        return "test"
+
+def test_function():
+    return 42
+
+print("Module loaded")
+"""
+        )
+
+        # Process the file
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+
+        from pyxplod.pyxplod import process_python_file_dirs
+
+        process_python_file_dirs(test_file, output_dir, input_dir)
+
+        # Check output directory structure
+        assert (output_dir / "test").is_dir()
+        assert (output_dir / "test" / "__init__.py").exists()
+        assert (output_dir / "test" / "test_class.py").exists()
+        assert (output_dir / "test" / "test_function.py").exists()
+
+        # Check __init__.py content
+        init_content = (output_dir / "test" / "__init__.py").read_text()
+        assert "import os" in init_content
+        assert "from .test_class import TestClass" in init_content
+        assert "from .test_function import test_function" in init_content
+        assert "print('Module loaded')" in init_content or 'print("Module loaded")' in init_content
+
+        # Check extracted files don't have filename prefix
+        class_content = (output_dir / "test" / "test_class.py").read_text()
+        assert "class TestClass:" in class_content
+        assert "def method(self):" in class_content
+
+        func_content = (output_dir / "test" / "test_function.py").read_text()
+        assert "def test_function():" in func_content
+        assert "return 42" in func_content
+
+    def test_process_file_no_definitions_dirs(self, tmp_path):
+        """Test processing a file with no definitions using dirs method."""
+        input_dir = tmp_path / "input"
+        input_dir.mkdir()
+
+        test_file = input_dir / "constants.py"
+        test_file.write_text(
+            """
+# Constants file
+VERSION = "1.0.0"
+DEBUG = True
+"""
+        )
+
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+
+        from pyxplod.pyxplod import process_python_file_dirs
+
+        process_python_file_dirs(test_file, output_dir, input_dir)
+
+        # Should create a directory with __init__.py containing original content
+        assert (output_dir / "constants").is_dir()
+        assert (output_dir / "constants" / "__init__.py").exists()
+        assert (output_dir / "constants" / "__init__.py").read_text() == test_file.read_text()

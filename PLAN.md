@@ -1,67 +1,159 @@
 # PLAN.md
 
+## Alternative Implementation: --method dirs
+
+### Overview
+The `--method dirs` option provides an alternative way to explode Python files. Instead of creating separate files in the same directory (default `--method files` behavior), this method creates a subfolder for each Python file and organizes the extracted code differently.
+
+### Specification for --method dirs
+
+When using `--method dirs`, pyxplod will:
+
+1. **Convert each .py file to a directory** with the same name (without .py extension)
+2. **Extract each class and function** into separate .py files within that directory
+3. **Create an `__init__.py`** containing:
+   - All module-level imports from the original file
+   - Imports for all extracted classes/functions
+   - Any remaining module-level code (constants, module variables, etc.)
+
+### Example Transformation (--method dirs)
+
+Input: `src/utils.py`
+```python
+import os
+from typing import List
+
+CONSTANT = "value"
+
+class MyClass:
+    def method(self):
+        pass
+
+def my_function():
+    pass
+
+# Module-level code
+print("Module loaded")
+```
+
+Output structure:
+```
+output/
+└── src/
+    └── utils/
+        ├── __init__.py
+        ├── my_class.py
+        └── my_function.py
+```
+
+**output/src/utils/__init__.py:**
+```python
+import os
+from typing import List
+
+from .my_class import MyClass
+from .my_function import my_function
+
+CONSTANT = "value"
+
+# Module-level code
+print("Module loaded")
+```
+
+**output/src/utils/my_class.py:**
+```python
+import os
+from typing import List
+
+class MyClass:
+    def method(self):
+        pass
+```
+
+**output/src/utils/my_function.py:**
+```python
+import os
+from typing import List
+
+def my_function():
+    pass
+```
+
+### Implementation Details for --method dirs
+
+1. **Directory Creation**: Each .py file becomes a package (directory with __init__.py)
+2. **Import Handling**: The __init__.py re-exports all extracted components to maintain API compatibility
+3. **Naming**: Use simple snake_case names without the original filename prefix
+4. **Compatibility**: External imports remain unchanged: `from src.utils import MyClass` still works
+
+---
+
 ## pyxplod Implementation Plan
 
 ### Overview
 `pyxplod` is a Python tool that deterministically "explodes" a Python project by extracting classes and functions into separate files and replacing them with imports.
 
-### Detailed Implementation Steps
+### Current Implementation Status
 
-- [ ] **Phase 1: Core Infrastructure**
-  - [ ] Set up CLI interface using `fire` library
-  - [ ] Add `--input` and `--output` command-line arguments
-  - [ ] Add `--verbose` flag for debug logging
-  - [ ] Set up loguru-based logging system
-  - [ ] Validate input/output paths exist and are accessible
+The core `pyxplod` functionality has been implemented with the following features:
 
-- [ ] **Phase 2: File Discovery**
-  - [ ] Implement recursive Python file discovery using `pathlib`
-  - [ ] Filter for `.py` files only
-  - [ ] Maintain relative path structure for output
-  - [ ] Skip `__pycache__` and other Python metadata directories
+- ✅ CLI interface using `fire` with `--input`, `--output`, `--method`, and `--verbose` flags
+- ✅ Two extraction methods: `files` (default) and `dirs`
+- ✅ Recursive Python file discovery with proper filtering
+- ✅ AST-based parsing and modification
+- ✅ Class and function extraction with snake_case naming
+- ✅ Automatic import generation and replacement
+- ✅ Import optimization - only includes imports actually used in extracted files
+- ✅ Error handling for syntax errors and edge cases
+- ✅ Progress bars and logging with `loguru` and `rich`
+- ✅ Comprehensive test suite (79% coverage)
 
-- [ ] **Phase 3: AST Processing**
-  - [ ] Parse each Python file into AST using `ast` module
-  - [ ] Identify all class definitions (`ast.ClassDef`)
-  - [ ] Identify all function definitions (`ast.FunctionDef`)
-  - [ ] Extract import statements to preserve in split files
-  - [ ] Handle nested classes and functions appropriately
+### Remaining Implementation Tasks
 
-- [ ] **Phase 4: File Generation**
-  - [ ] Create naming convention: `original_filename_class_or_function_name.py`
-  - [ ] Convert class/function names to snake_case
-  - [ ] Handle name deduplication if conflicts arise
-  - [ ] Create output directory structure mirroring input
-  - [ ] Generate new files with proper imports and definitions
+- [ ] **Phase 1: Critical Fixes & Improvements** (High Priority)
+  - [ ] Preserve decorators and docstrings properly in extracted files
+  - [ ] Handle comments between definitions (currently lost)
+  - [ ] Add proper encoding handling for Unicode files
+  - [ ] Improve error recovery - partial processing instead of skipping entirely
+  - [ ] Fix import statement positioning relative to docstrings
 
-- [ ] **Phase 5: AST Modification**
-  - [ ] Replace class/function definitions with relative imports
-  - [ ] Calculate correct relative import paths
-  - [ ] Preserve module-level code and imports
-  - [ ] Handle docstrings and decorators correctly
-  - [ ] Maintain proper Python syntax in modified files
+- [ ] **Phase 2: Code Quality & Architecture** (Medium Priority)
+  - [ ] Refactor `pyxplod.py` into multiple modules (currently 450+ lines):
+    - `ast_utils.py` - AST manipulation functions
+    - `file_utils.py` - File discovery and I/O operations
+    - `processors.py` - Processing method implementations (files/dirs)
+    - `cli.py` - Command line interface
+  - [ ] Add comprehensive type hints using simple syntax (list, dict, |)
+  - [ ] Implement proper debug logging patterns per CLAUDE.md
+  - [ ] Add integration tests with real Python projects
 
-- [ ] **Phase 6: File Writing**
-  - [ ] Write modified AST back to Python code using `ast.unparse()`
-  - [ ] Preserve formatting as much as possible
-  - [ ] Create output directory structure
-  - [ ] Write all generated files with proper permissions
-  - [ ] Handle file conflicts gracefully
+- [ ] **Phase 3: Essential User Features** (Medium Priority)
+  - [ ] Add `--dry-run` flag to preview changes without writing files
+  - [ ] Support `.pyxplod.toml` configuration file
+  - [ ] Handle nested classes and inner functions
+  - [ ] Add `--exclude` pattern for skipping files/directories
+  - [ ] Add `--include-private` flag for private methods/classes
 
-- [ ] **Phase 7: Edge Cases & Error Handling**
-  - [ ] Handle empty files
-  - [ ] Handle files with only imports
-  - [ ] Handle syntax errors in input files
-  - [ ] Handle circular dependencies
-  - [ ] Handle files with no classes/functions
-  - [ ] Add proper error messages and recovery
+- [ ] **Phase 4: Advanced Features** (Low Priority)
+  - [ ] Add `--format` option to preserve formatting using Black
+  - [ ] Support for async function annotations and decorators
+  - [ ] Handle complex decorator chains (@property, @classmethod, etc.)
+  - [ ] Implement reverse operation (`--method implode` to merge files back)
+  - [ ] Add `--verify` flag to validate output integrity
 
-- [ ] **Phase 8: Testing & Documentation**
-  - [ ] Write unit tests for each component
-  - [ ] Create integration tests with sample projects
-  - [ ] Test edge cases
-  - [ ] Update README with examples
-  - [ ] Add inline documentation
+- [ ] **Phase 5: Performance & Scalability** (Future)
+  - [ ] Parallel processing using multiprocessing for large codebases
+  - [ ] Streaming AST processing for very large files
+  - [ ] Incremental mode - only process changed files since last run
+  - [ ] Memory-efficient processing for huge codebases
+  - [ ] Progress persistence for resumable operations
+
+- [ ] **Phase 6: Testing & Documentation** (Ongoing)
+  - [ ] Add property-based testing with Hypothesis
+  - [ ] Create test suite with popular Python projects (requests, flask, etc.)
+  - [ ] Add performance benchmarks and profiling
+  - [ ] Generate API documentation with Sphinx
+  - [ ] Add visual examples and before/after diagrams
 
 ### Technical Decisions
 
@@ -77,10 +169,14 @@
 - `ast` - Python AST parsing (built-in)
 - `pathlib` - Path operations (built-in)
 
-### Example Transformation
+### Example Transformations
+
+#### Method: files (default)
 
 Input: `src/utils.py`
 ```python
+import os
+
 class MyClass:
     def method(self):
         pass
@@ -90,19 +186,45 @@ def my_function():
 ```
 
 Output:
-- `output/src/utils.py`:
-  ```python
-  from .utils_my_class import MyClass
-  from .utils_my_function import my_function
-  ```
-- `output/src/utils_my_class.py`:
-  ```python
-  class MyClass:
-      def method(self):
-          pass
-  ```
-- `output/src/utils_my_function.py`:
-  ```python
-  def my_function():
-      pass
-  ```
+```
+output/src/
+├── utils.py
+├── utils_my_class.py
+└── utils_my_function.py
+```
+
+#### Method: dirs
+
+Same input produces:
+```
+output/src/
+└── utils/
+    ├── __init__.py
+    ├── my_class.py
+    └── my_function.py
+```
+
+Both methods maintain API compatibility - external code using `from src.utils import MyClass` continues to work unchanged.
+
+### Known Issues & Limitations
+
+1. **Lost Elements**: Comments between definitions and some formatting are not preserved
+2. **Limited Scope**: Only handles top-level classes and functions, not nested definitions
+3. **Formatting**: Uses `ast.unparse()` which doesn't preserve original code formatting
+4. **Memory Usage**: Entire AST is kept in memory, could be problematic for very large files
+5. **Error Handling**: Files with syntax errors are skipped entirely instead of partial processing
+6. **Decorator Preservation**: Some decorators may not be properly preserved in extracted files
+
+### Design Decisions & Rationale
+
+1. **Two Methods Approach**: 
+   - `files` method: Simple, flat structure, good for small modules
+   - `dirs` method: Package structure, better for larger modules, cleaner imports
+
+2. **AST-based Processing**: Ensures syntactic correctness and proper Python structure
+
+3. **Import Strategy**: Currently copies all imports for safety, needs optimization
+
+4. **Naming Convention**: Snake_case with deduplication ensures filesystem compatibility
+
+5. **Error Philosophy**: Fail safely, skip problematic files with clear error messages
