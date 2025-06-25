@@ -88,7 +88,7 @@ def filter_imports_for_names(imports: list[ast.stmt], used_names: set[str]) -> l
             # For 'from x import y, z', check each imported name
             needed_aliases = []
             for alias in imp.names:
-                name_in_code = alias.asname if alias.asname else alias.name
+                name_in_code = alias.asname or alias.name
                 if name_in_code in used_names:
                     needed_aliases.append(alias)
 
