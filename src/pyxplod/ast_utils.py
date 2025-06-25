@@ -12,11 +12,11 @@ def extract_imports(tree: ast.AST) -> list[ast.stmt]:
 
     Returns a list of Import and ImportFrom nodes at module level only.
     """
-    imports = []
-    for node in tree.body:
-        if isinstance(node, ast.Import | ast.ImportFrom):
-            imports.append(node)
-    return imports
+    return [
+        node
+        for node in tree.body
+        if isinstance(node, ast.Import | ast.ImportFrom)
+    ]
 
 
 def analyze_name_usage(node: ast.AST) -> set[str]:
