@@ -134,7 +134,9 @@ def find_module_variables(tree: ast.AST) -> list[tuple[ast.stmt, str]]:
     for node in tree.body:
         if isinstance(node, ast.Assign):
             # Handle simple assignments like: variable = expression
-            for target in node.targets:
-                if isinstance(target, ast.Name):
-                    variables.append((node, target.id))
+            variables.extend(
+                (node, target.id)
+                for target in node.targets
+                if isinstance(target, ast.Name)
+            )
     return variables
