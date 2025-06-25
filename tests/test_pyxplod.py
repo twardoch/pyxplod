@@ -5,16 +5,18 @@
 
 import ast
 
-from pyxplod.pyxplod import (
+from pyxplod.ast_utils import (
     create_import_statement,
     extract_imports,
     find_definitions,
+)
+from pyxplod.file_utils import (
     find_python_files,
     generate_filename,
-    process_python_file,
-    to_snake_case,
     validate_paths,
 )
+from pyxplod.processors import process_python_file, process_python_file_dirs
+from pyxplod.utils import to_snake_case
 
 
 class TestUtilityFunctions:
@@ -86,19 +88,19 @@ x = 10  # Not a definition
         existing = set()
 
         # First file
-        name1 = generate_filename("module", "MyClass", "class", existing)
+        name1 = generate_filename("module", "MyClass", existing)  # "class" argument removed
         assert name1 == "module_my_class.py"
 
         # Duplicate should get a number
-        name2 = generate_filename("module", "MyClass", "class", existing)
+        name2 = generate_filename("module", "MyClass", existing)  # "class" argument removed
         assert name2 == "module_my_class_2.py"
 
         # Another duplicate
-        name3 = generate_filename("module", "MyClass", "class", existing)
+        name3 = generate_filename("module", "MyClass", existing)  # "class" argument removed
         assert name3 == "module_my_class_3.py"
 
         # Different name should work normally
-        name4 = generate_filename("module", "OtherClass", "class", existing)
+        name4 = generate_filename("module", "OtherClass", existing)  # "class" argument removed
         assert name4 == "module_other_class.py"
 
     def test_create_import_statement(self):
@@ -319,8 +321,6 @@ print("Module loaded")
         output_dir = tmp_path / "output"
         output_dir.mkdir()
 
-        from pyxplod.pyxplod import process_python_file_dirs
-
         process_python_file_dirs(test_file, output_dir, input_dir)
 
         # Check output directory structure
@@ -361,8 +361,6 @@ DEBUG = True
 
         output_dir = tmp_path / "output"
         output_dir.mkdir()
-
-        from pyxplod.pyxplod import process_python_file_dirs
 
         process_python_file_dirs(test_file, output_dir, input_dir)
 

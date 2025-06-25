@@ -3,7 +3,7 @@
 
 import fire
 
-from pyxplod.pyxplod import main
+from pyxplod.cli import main  # Updated import
 
 if __name__ == "__main__":
     fire.Fire(main)

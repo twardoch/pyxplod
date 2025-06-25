@@ -8,6 +8,17 @@
 - Refined PLAN.md with clearer phase priorities and updated status
 - Enhanced README.md with more comprehensive examples and professional formatting
 
+### Refactored
+- **Core Module Restructuring**: The main `pyxplod.py` script has been significantly refactored into a more modular architecture to improve maintainability, readability, and testability.
+  - Moved utility functions (e.g., `to_snake_case`) to `src/pyxplod/utils.py`.
+  - Consolidated all AST (Abstract Syntax Tree) related functions into `src/pyxplod/ast_utils.py`.
+  - Grouped file system operations, path validation, and filename generation logic into `src/pyxplod/file_utils.py`.
+  - Centralized the core processing logic for both `files` and `dirs` methods (`process_python_file`, `process_python_file_dirs`) into `src/pyxplod/processors.py`.
+  - Migrated the command-line interface logic, including the `main` function and `fire` integration, to `src/pyxplod/cli.py`.
+  - The original `src/pyxplod/pyxplod.py` now serves as a thin entry point, re-exporting `main` from `cli.py`.
+  - Updated `__init__.py` and `__main__.py` to reflect new module structure and `main` function location.
+  - Ensured all internal imports and dependencies are correctly resolved across the new modules.
+
 ### Documentation
 - Improved task tracking and project roadmap visibility
 - Better organized development priorities by sprint cycles

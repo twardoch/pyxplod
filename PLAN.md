@@ -48,11 +48,12 @@ def my_function():
 ## Next Sprint - Architecture & Features (v0.5.0)
 
 ### Code Architecture
-- [ ] **Refactor monolithic pyxplod.py** (currently 450+ lines)
-  - [ ] Extract `ast_utils.py` - AST manipulation and analysis functions
-  - [ ] Extract `file_utils.py` - File discovery, I/O, and path operations
-  - [ ] Extract `processors.py` - Method implementation logic (files/dirs)
-  - [ ] Extract `cli.py` - Command line interface and argument parsing
+- [x] **Refactor monolithic pyxplod.py** (Completed)
+  - [x] Extract `utils.py` - Common utility functions (e.g., `to_snake_case`)
+  - [x] Extract `ast_utils.py` - AST manipulation and analysis functions
+  - [x] Extract `file_utils.py` - File discovery, I/O, and path operations
+  - [x] Extract `processors.py` - Method implementation logic (files/dirs)
+  - [x] Extract `cli.py` - Command line interface and argument parsing, `main` function
 
 ### Type System & Documentation
 - [ ] **Enhance type system**
@@ -116,14 +117,15 @@ def my_function():
   - [ ] Improve error recovery - partial processing instead of skipping entirely
   - [ ] Fix import statement positioning relative to docstrings
 
-- [ ] **Phase 2: Code Quality & Architecture** (Medium Priority)
-  - [ ] Refactor `pyxplod.py` into multiple modules (currently 450+ lines):
+- [x] **Phase 2: Code Quality & Architecture** (Completed for refactoring part)
+  - [x] Refactor `pyxplod.py` into multiple modules:
+    - `utils.py` - Common utility functions (e.g., `to_snake_case`)
     - `ast_utils.py` - AST manipulation functions
     - `file_utils.py` - File discovery and I/O operations
     - `processors.py` - Processing method implementations (files/dirs)
-    - `cli.py` - Command line interface
-  - [ ] Add comprehensive type hints using simple syntax (list, dict, |)
-  - [ ] Implement proper debug logging patterns per CLAUDE.md
+    - `cli.py` - Command line interface and `main` function
+  - [ ] Add comprehensive type hints using simple syntax (list, dict, |) (Ongoing)
+  - [ ] Implement proper debug logging patterns per CLAUDE.md (Partially addressed)
   - [ ] Add integration tests with real Python projects
 
 - [ ] **Phase 3: Essential User Features** (Medium Priority)
