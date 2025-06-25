@@ -74,11 +74,11 @@ def write_extracted_file(
 
 def find_python_files(directory: Path) -> list[Path]:
     """Recursively find all Python files in a directory."""
-    python_files: list[Path] = []
-    for file in directory.rglob("*.py"):
-        # Skip __pycache__ and other Python metadata
-        if "__pycache__" not in str(file) and ".pyc" not in str(file):
-            python_files.append(file)
+    python_files: list[Path] = [
+        file
+        for file in directory.rglob("*.py")
+        if "__pycache__" not in str(file) and ".pyc" not in str(file)
+    ]
     return sorted(python_files)
 
 
