@@ -32,5 +32,19 @@ def my_function():
 
 **Status**: ✅ **RESOLVED** - Scope resolution implemented in both `files` and `dirs` methods with comprehensive testing.
 
+## ✅ COMPLETED: Codebase Refactoring (MVP)
 
+The core `pyxplod.py` script has been refactored into a modular structure to improve maintainability and readability.
 
+**What was done:**
+- The monolithic `pyxplod.py` was broken down into the following modules:
+  - `utils.py`: For common helper functions like `to_snake_case`.
+  - `ast_utils.py`: For all AST (Abstract Syntax Tree) manipulation and analysis.
+  - `file_utils.py`: For file system operations, path validation, and filename generation.
+  - `processors.py`: Contains the core logic for `process_python_file` and `process_python_file_dirs`.
+  - `cli.py`: Handles the command-line interface using `fire`, including the `main` function and logging setup.
+- `pyxplod.py` itself is now a thin layer, primarily re-exporting `main` from `cli.py`.
+- Imports and dependencies between these new modules have been updated.
+- `__init__.py` and `__main__.py` have been updated to reflect the new location of `main`.
+
+**Status**: ✅ **COMPLETED** - Refactoring of `pyxplod.py` into submodules is complete.
