@@ -72,7 +72,7 @@ def filter_imports_for_names(imports: list[ast.stmt], used_names: set[str]) -> l
             needed_aliases = []
             for alias in imp.names:
                 # The name used in code is either the alias or the module name
-                name_in_code = alias.asname if alias.asname else alias.name
+                name_in_code = alias.asname or alias.name
                 # For module.submodule, we check the first part
                 base_name = name_in_code.split(".")[0]
                 if base_name in used_names:
