@@ -2,14 +2,23 @@
 
 ## [Unreleased]
 
+### Added
+- Implemented scope resolution for module-level variables in both `files` and `dirs` methods (2025-05-27)
+  - Added `find_module_variables()` function to detect module-level assignments
+  - Enhanced `write_extracted_file()` to include required module variables in extracted files
+  - Module variables like `console = Console()` are now properly included in extracted files
+  - Improved import filtering to include imports needed by module variables
+
 ### Changed
+- Updated `ast_utils.py` with multiple improvements for better module variable handling (2025-05-28)
+- Enhanced `file_utils.py` for improved file processing (2025-05-28)
 - Updated project documentation and planning files
 - Reorganized TODO.md with sprint-based task organization  
 - Refined PLAN.md with clearer phase priorities and updated status
 - Enhanced README.md with more comprehensive examples and professional formatting
 
 ### Refactored
-- **Core Module Restructuring**: The main `pyxplod.py` script has been significantly refactored into a more modular architecture to improve maintainability, readability, and testability.
+- **Core Module Restructuring** (2025-05-27): The main `pyxplod.py` script has been significantly refactored into a more modular architecture to improve maintainability, readability, and testability.
   - Moved utility functions (e.g., `to_snake_case`) to `src/pyxplod/utils.py`.
   - Consolidated all AST (Abstract Syntax Tree) related functions into `src/pyxplod/ast_utils.py`.
   - Grouped file system operations, path validation, and filename generation logic into `src/pyxplod/file_utils.py`.

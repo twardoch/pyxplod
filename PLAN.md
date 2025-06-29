@@ -1,231 +1,226 @@
 # PLAN.md
+# this_file: PLAN.md
 
-## Critical Scope Resolution Issue (URGENT)
+## Project Overview
 
-**Problem**: When extracting functions/classes with the `dirs` method, module-level variables are not included in extracted files, causing `NameError` in the extracted code.
+pyxplod is a Python code refactoring tool that "explodes" Python modules by extracting classes and functions into separate files. It offers two methods:
+- `files`: Creates flat file structure with prefixed names
+- `dirs`: Creates package directories with cleaner imports
 
-**Example**:
-```python
-# Original file
-from rich.console import Console
-console = Console()
+## Current State Analysis (2025-06-29)
 
-def my_function():
-    console.print("Hello")  # 'console' undefined in extracted file
-```
+### ✅ Completed Features
+- Core functionality for extracting classes/functions
+- Two extraction methods (files/dirs)
+- Module-level variable resolution
+- Smart import filtering
+- Basic CLI with fire
+- 79% test coverage
+- Modular architecture refactoring
 
-**Solution Strategy**:
-1. **Detect Module-Level Variables**: Identify assignments like `console = Console()` at module level
-2. **Analyze Dependencies**: Check which extracted definitions reference these variables
-3. **Include Required Variables**: Copy necessary module-level assignments to extracted files
-4. **Maintain Import Order**: Ensure variables come after their required imports
+### 🔍 Key Issues Identified
 
-**Implementation Plan**:
-- [x] Add `find_module_variables()` function to detect module-level assignments
-- [x] Enhance `analyze_name_usage()` to distinguish between imported names and module variables
-- [x] Update `write_extracted_file()` to include required module variables
-- [x] Apply fix to both `files` and `dirs` methods
-- [x] Test with rich.console example from TODO.md
+1. **Type Safety**: Minimal type hints throughout codebase
+2. **Error Handling**: Basic error handling, no graceful recovery
+3. **Documentation**: Missing comprehensive docstrings and API docs
+4. **Features**: Missing essential features like dry-run, config files
+5. **Performance**: No optimization for large codebases
+6. **Code Quality**: Inconsistent logging patterns, missing validation
 
-**Status**: ✅ **COMPLETED** - Scope resolution implemented and tested successfully.
+## Sprint 1: Code Quality & Robustness (High Priority)
 
-## Sprint 2
+### 1.1 Type System Enhancement
+- [ ] Add comprehensive type hints to all functions
+  - [ ] Use simple types: `list[str]`, `dict[str, Any]`, `str | None`
+  - [ ] Add return type annotations
+  - [ ] Use proper AST node types instead of generic `ast.AST`
+  - [ ] Add type hints to test files
+  - [ ] Run mypy in strict mode as part of CI
 
-### Code Quality & Preservation Issues
-- [ ] **Fix code element preservation** (HIGH PRIORITY)
-  - [ ] Maintain decorators on extracted functions/classes (@property, @staticmethod, etc.)
-  - [ ] Preserve docstrings in correct positions (before or after imports)
-  - [ ] Handle comments between definitions (currently lost during AST processing)
-  - [ ] Ensure type annotations are preserved exactly
+### 1.2 Error Handling & Validation
+- [ ] Implement proper error recovery
+  - [ ] Add `--skip-errors` flag to continue on syntax errors
+  - [ ] Partial file processing when AST parsing fails
+  - [ ] Better error messages with context (file:line)
+  - [ ] Validate all inputs and fail early with clear messages
+- [ ] Add Unicode/encoding support
+  - [ ] Auto-detect file encoding
+  - [ ] Support UTF-8, UTF-16, Latin-1
+  - [ ] Handle encoding errors gracefully
 
-### Error Handling & Robustness  
-- [ ] **Improve error handling and Unicode support**
-  - [ ] Add proper Unicode/encoding support (UTF-8, other encodings)
-  - [ ] Implement partial file processing on syntax errors
-  - [ ] Better error messages with file names and line numbers
-  - [ ] Add `--skip-errors` flag to continue processing despite errors
+### 1.3 Logging & Debugging
+- [ ] Implement proper logging pattern per CLAUDE.md
+  - [ ] Add `this_file` marker to all source files
+  - [ ] Use loguru consistently with proper log levels
+  - [ ] Add `--log-level` CLI option
+  - [ ] Log to file option with `--log-file`
+  - [ ] Add timing information for performance debugging
 
-## Next Sprint - Architecture & Features (v0.5.0)
+### 1.4 Code Element Preservation
+- [ ] Fix decorator preservation
+  - [ ] Maintain `@property`, `@staticmethod`, `@classmethod`
+  - [ ] Handle complex decorator chains
+  - [ ] Preserve decorator arguments
+- [ ] Fix docstring handling
+  - [ ] Preserve docstring position relative to imports
+  - [ ] Handle multi-line docstrings correctly
+  - [ ] Maintain docstring formatting
+- [ ] Preserve comments
+  - [ ] Extract comments between definitions
+  - [ ] Maintain inline comments
+  - [ ] Handle block comments properly
 
-### Code Architecture
-- [x] **Refactor monolithic pyxplod.py** (Completed)
-  - [x] Extract `utils.py` - Common utility functions (e.g., `to_snake_case`)
-  - [x] Extract `ast_utils.py` - AST manipulation and analysis functions
-  - [x] Extract `file_utils.py` - File discovery, I/O, and path operations
-  - [x] Extract `processors.py` - Method implementation logic (files/dirs)
-  - [x] Extract `cli.py` - Command line interface and argument parsing, `main` function
+## Sprint 2: Essential Features (High Priority)
 
-### Type System & Documentation
-- [ ] **Enhance type system**
-  - [ ] Add comprehensive type hints using simple syntax (list, dict, str | None)
-  - [ ] Use proper AST node types instead of generic types
-  - [ ] Add return type annotations to all functions
+### 2.1 CLI Enhancements
+- [ ] Add `--dry-run` mode
+  - [ ] Show what would be changed without writing
+  - [ ] Display file creation/modification summary
+  - [ ] Optionally output to stdout
+- [ ] Add configuration file support
+  - [ ] Support `.pyxplod.toml` configuration
+  - [ ] Allow project-specific settings
+  - [ ] Override via CLI flags
+  - [ ] Document all configuration options
 
-### User Experience Features
-- [ ] **Essential user features**
-  - [ ] Add `--dry-run` mode to preview changes without writing files
-  - [ ] Create `.pyxplod.toml` configuration file support
-  - [ ] Add `--exclude` patterns for skipping files/directories
-  - [ ] Add `--include-private` flag for private methods/classes
+### 2.2 File Filtering
+- [ ] Add `--exclude` patterns
+  - [ ] Support glob patterns
+  - [ ] Multiple exclude patterns
+  - [ ] Read from `.pyxplodignore` file
+- [ ] Add `--include` patterns
+  - [ ] Whitelist specific files/patterns
+  - [ ] Override default Python file detection
+- [ ] Add `--include-private` flag
+  - [ ] Process private methods/classes (_name)
+  - [ ] Process dunder methods (__name__)
 
-## Future Backlog
+### 2.3 Advanced Code Handling
+- [ ] Support nested definitions
+  - [ ] Extract nested classes
+  - [ ] Handle inner functions
+  - [ ] Maintain proper scoping
+- [ ] Handle async code
+  - [ ] Support async functions
+  - [ ] Handle async decorators
+  - [ ] Preserve async context managers
 
-### Advanced Code Handling
-- [ ] **Complex code structures**
-  - [ ] Handle nested classes and inner functions
-  - [ ] Support async functions and async decorators
-  - [ ] Handle complex decorator chains (@property, @classmethod, @lru_cache)
-  - [ ] Support class methods, static methods, and property decorators
+## Sprint 3: Testing & Documentation (Medium Priority)
 
-### Testing & Quality Assurance
-- [ ] **Expand test coverage**
-  - [ ] Test decorator preservation with various decorator types
-  - [ ] Test Unicode file handling with different encodings
-  - [ ] Test large file processing (>1000 lines)
-  - [ ] Test error conditions and edge cases
-  - [ ] Add integration tests with popular packages (requests, flask, django)
+### 3.1 Test Suite Enhancement
+- [ ] Increase test coverage to 95%+
+  - [ ] Add edge case tests
+  - [ ] Test error conditions
+  - [ ] Test Unicode handling
+  - [ ] Test large files
+- [ ] Add property-based testing
+  - [ ] Use Hypothesis for fuzzing
+  - [ ] Test with random Python code
+  - [ ] Verify round-trip correctness
+- [ ] Add integration tests
+  - [ ] Test with popular packages (requests, flask)
+  - [ ] Verify no functionality breaks
+  - [ ] Performance benchmarks
 
-### Performance & Scalability
-- [ ] **Performance improvements**
-  - [ ] Implement parallel file processing for large codebases
-  - [ ] Add streaming AST processing for very large files
-  - [ ] Create incremental mode - only process changed files
-  - [ ] Add progress persistence for resumable operations
+### 3.2 Documentation
+- [ ] Add comprehensive docstrings
+  - [ ] Document all public functions
+  - [ ] Add usage examples
+  - [ ] Document edge cases
+- [ ] Create API documentation
+  - [ ] Use Sphinx for generation
+  - [ ] Host on Read the Docs
+  - [ ] Add architecture diagrams
+- [ ] Improve README
+  - [ ] Add visual examples (before/after)
+  - [ ] Add troubleshooting section
+  - [ ] Add FAQ section
 
-### Advanced Features
-- [ ] **Professional tooling features**
-  - [ ] Add `--format` flag with Black integration for code formatting
-  - [ ] Add `--verify` flag to validate output file integrity
-  - [ ] Implement reverse operation (`--method implode`) to merge files back
-  - [ ] Create plugin system for custom processing logic
+## Sprint 4: Performance & Advanced Features (Low Priority)
 
-### Documentation & Examples
-- [ ] **Improve documentation**
-  - [ ] Add inline comments explaining complex AST operations
-  - [ ] Document import analysis and filtering logic
-  - [ ] Create examples directory with before/after transformations
-  - [ ] Add visual diagrams showing both processing methods
+### 4.1 Performance Optimization
+- [ ] Implement parallel processing
+  - [ ] Use multiprocessing for file processing
+  - [ ] Configurable worker count
+  - [ ] Progress tracking across workers
+- [ ] Memory optimization
+  - [ ] Stream processing for large files
+  - [ ] Lazy AST evaluation
+  - [ ] Garbage collection optimization
+- [ ] Add incremental mode
+  - [ ] Only process changed files
+  - [ ] Cache processing results
+  - [ ] Fast re-run support
 
+### 4.2 Advanced Features
+- [ ] Add `--format` option
+  - [ ] Integrate with Black
+  - [ ] Preserve original formatting option
+  - [ ] Custom formatter support
+- [ ] Implement reverse operation
+  - [ ] `--method implode` to merge files back
+  - [ ] Maintain git history
+  - [ ] Handle conflicts
+- [ ] Add `--verify` mode
+  - [ ] Validate output correctness
+  - [ ] Run basic smoke tests
+  - [ ] Check import cycles
 
+## Sprint 5: Distribution & Deployment (Low Priority)
 
-### Remaining Implementation Tasks
+### 5.1 Packaging Improvements
+- [ ] Add better package metadata
+  - [ ] Comprehensive classifiers
+  - [ ] Better project description
+  - [ ] Add keywords for discovery
+- [ ] Create standalone executables
+  - [ ] Use PyInstaller/Nuitka
+  - [ ] Cross-platform binaries
+  - [ ] Auto-update mechanism
 
-- [ ] **Phase 1: Critical Fixes & Improvements** (High Priority)
-  - [ ] Preserve decorators and docstrings properly in extracted files
-  - [ ] Handle comments between definitions (currently lost)
-  - [ ] Add proper encoding handling for Unicode files
-  - [ ] Improve error recovery - partial processing instead of skipping entirely
-  - [ ] Fix import statement positioning relative to docstrings
+### 5.2 Integration Support
+- [ ] Add pre-commit hook
+  - [ ] Validate code before commit
+  - [ ] Auto-fix mode
+  - [ ] Configuration options
+- [ ] IDE plugins
+  - [ ] VS Code extension
+  - [ ] PyCharm plugin
+  - [ ] Sublime Text package
 
-- [x] **Phase 2: Code Quality & Architecture** (Completed for refactoring part)
-  - [x] Refactor `pyxplod.py` into multiple modules:
-    - `utils.py` - Common utility functions (e.g., `to_snake_case`)
-    - `ast_utils.py` - AST manipulation functions
-    - `file_utils.py` - File discovery and I/O operations
-    - `processors.py` - Processing method implementations (files/dirs)
-    - `cli.py` - Command line interface and `main` function
-  - [ ] Add comprehensive type hints using simple syntax (list, dict, |) (Ongoing)
-  - [ ] Implement proper debug logging patterns per CLAUDE.md (Partially addressed)
-  - [ ] Add integration tests with real Python projects
+## Technical Debt & Refactoring
 
-- [ ] **Phase 3: Essential User Features** (Medium Priority)
-  - [ ] Add `--dry-run` flag to preview changes without writing files
-  - [ ] Support `.pyxplod.toml` configuration file
-  - [ ] Handle nested classes and inner functions
-  - [ ] Add `--exclude` pattern for skipping files/directories
-  - [ ] Add `--include-private` flag for private methods/classes
+### Clean Code
+- [ ] Remove unused variables and imports
+- [ ] Consolidate duplicate code
+- [ ] Improve variable naming consistency
+- [ ] Add constants for magic values
 
-- [ ] **Phase 4: Advanced Features** (Low Priority)
-  - [ ] Add `--format` option to preserve formatting using Black
-  - [ ] Support for async function annotations and decorators
-  - [ ] Handle complex decorator chains (@property, @classmethod, etc.)
-  - [ ] Implement reverse operation (`--method implode` to merge files back)
-  - [ ] Add `--verify` flag to validate output integrity
+### Architecture
+- [ ] Consider plugin architecture for processors
+- [ ] Abstract file I/O for testability
+- [ ] Improve separation of concerns
+- [ ] Add facade pattern for complex operations
 
-- [ ] **Phase 5: Performance & Scalability** (Future)
-  - [ ] Parallel processing using multiprocessing for large codebases
-  - [ ] Streaming AST processing for very large files
-  - [ ] Incremental mode - only process changed files since last run
-  - [ ] Memory-efficient processing for huge codebases
-  - [ ] Progress persistence for resumable operations
+## Risk Mitigation
 
-- [ ] **Phase 6: Testing & Documentation** (Ongoing)
-  - [ ] Add property-based testing with Hypothesis
-  - [ ] Create test suite with popular Python projects (requests, flask, etc.)
-  - [ ] Add performance benchmarks and profiling
-  - [ ] Generate API documentation with Sphinx
-  - [ ] Add visual examples and before/after diagrams
+1. **Breaking Changes**: Maintain backward compatibility
+2. **Performance**: Profile before optimizing
+3. **Complexity**: Keep simple things simple
+4. **Dependencies**: Minimize external dependencies
 
-### Technical Decisions
+## Success Metrics
 
-1. **AST vs. Regular Expressions**: Use AST for accurate parsing and modification
-2. **Import Style**: Use relative imports for split files to maintain portability
-3. **Naming Convention**: Snake_case with deduplication to avoid conflicts
-4. **Error Handling**: Fail gracefully, skip problematic files with warnings
-5. **Logging**: Verbose mode with loguru for debugging
+- Test coverage > 95%
+- Zero critical bugs
+- Processing speed > 1000 files/minute
+- Memory usage < 100MB for typical projects
+- User satisfaction (GitHub stars, issues resolved)
 
-### Dependencies Required
-- `fire` - CLI interface
-- `loguru` - Enhanced logging
-- `ast` - Python AST parsing (built-in)
-- `pathlib` - Path operations (built-in)
+## Next Steps
 
-### Example Transformations
-
-#### Method: files (default)
-
-Input: `src/utils.py`
-```python
-import os
-
-class MyClass:
-    def method(self):
-        pass
-
-def my_function():
-    pass
-```
-
-Output:
-```
-output/src/
-├── utils.py
-├── utils_my_class.py
-└── utils_my_function.py
-```
-
-#### Method: dirs
-
-Same input produces:
-```
-output/src/
-└── utils/
-    ├── __init__.py
-    ├── my_class.py
-    └── my_function.py
-```
-
-Both methods maintain API compatibility - external code using `from src.utils import MyClass` continues to work unchanged.
-
-### Known Issues & Limitations
-
-1. **Lost Elements**: Comments between definitions and some formatting are not preserved
-2. **Limited Scope**: Only handles top-level classes and functions, not nested definitions
-3. **Formatting**: Uses `ast.unparse()` which doesn't preserve original code formatting
-4. **Memory Usage**: Entire AST is kept in memory, could be problematic for very large files
-5. **Error Handling**: Files with syntax errors are skipped entirely instead of partial processing
-6. **Decorator Preservation**: Some decorators may not be properly preserved in extracted files
-
-### Design Decisions & Rationale
-
-1. **Two Methods Approach**: 
-   - `files` method: Simple, flat structure, good for small modules
-   - `dirs` method: Package structure, better for larger modules, cleaner imports
-
-2. **AST-based Processing**: Ensures syntactic correctness and proper Python structure
-
-3. **Import Strategy**: Currently copies all imports for safety, needs optimization
-
-4. **Naming Convention**: Snake_case with deduplication ensures filesystem compatibility
-
-5. **Error Philosophy**: Fail safely, skip problematic files with clear error messages
+1. Complete Sprint 1 (Code Quality)
+2. Release v0.4.0 with core improvements
+3. Gather user feedback
+4. Prioritize Sprint 2 features based on feedback
+5. Establish regular release cycle (monthly)
