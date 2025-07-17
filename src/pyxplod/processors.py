@@ -55,12 +55,12 @@ def process_python_file(input_file: Path, output_base: Path, input_root: Path) -
     for node in tree.body:
         is_definition = False
 
-        for def_node, def_type, def_name in definitions: # def_type is part of the tuple from find_definitions
+        for def_node, def_type, def_name in definitions:  # def_type is part of the tuple from find_definitions
             if node is def_node:
                 is_definition = True
 
                 # Generate filename for extracted definition
-                filename = generate_filename(base_name, def_name, existing_files) # def_type was correctly removed here
+                filename = generate_filename(base_name, def_name, existing_files)  # def_type was correctly removed here
 
                 # Write extracted file
                 extracted_path = output_dir / filename

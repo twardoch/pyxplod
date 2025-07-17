@@ -29,17 +29,30 @@ Using `pyxplod` offers several advantages:
 
 `pyxplod` is a Python package. You can install it using `uv pip`.
 
-1.  **From PyPI (Recommended if available):**
+1.  **From PyPI (Recommended):**
     ```bash
     uv pip install pyxplod
     ```
-    *(Note: This assumes the package is published to PyPI. If not, use the method below.)*
 
 2.  **From source (after cloning the repository):**
     ```bash
     git clone <repository_url>
     cd pyxplod
     uv pip install .
+    ```
+
+3.  **Using standalone binaries:**
+    
+    Download the appropriate binary for your platform from the [releases page](https://github.com/twardoch/pyxplod/releases):
+    
+    - Linux: `pyxplod-linux-amd64`
+    - macOS: `pyxplod-macos-amd64`
+    - Windows: `pyxplod-windows-amd64.exe`
+    
+    Make the binary executable (Unix/Linux/macOS):
+    ```bash
+    chmod +x pyxplod-linux-amd64
+    ./pyxplod-linux-amd64 --help
     ```
 
 ### How to Use
@@ -217,3 +230,44 @@ This project follows specific guidelines for coding and contributions, largely o
 9.  **Submit a Pull Request:** Open a pull request from your feature branch to the main `pyxplod` repository. Clearly describe the changes you've made and why.
 
 By following these guidelines, we can maintain a high-quality, understandable, and collaborative codebase.
+
+## Development and Release
+
+### For Contributors
+
+The project uses `uv` for package management and includes comprehensive CI/CD:
+
+```bash
+# Setup development environment
+make dev
+
+# Run tests
+make test
+
+# Build package
+make build
+
+# Run all checks (linting, type checking, tests)
+make check
+
+# Format code
+make format
+```
+
+### For Maintainers
+
+Releases are automated through git tags:
+
+```bash
+# Create a new release
+make tag VERSION=1.2.3
+
+# This triggers:
+# - GitHub Actions CI/CD pipeline
+# - Multi-platform testing (Linux, macOS, Windows)
+# - Binary compilation with PyInstaller
+# - PyPI publishing
+# - GitHub release creation
+```
+
+See [BUILD.md](BUILD.md) for detailed build and release instructions.
