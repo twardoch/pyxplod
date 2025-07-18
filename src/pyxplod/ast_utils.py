@@ -12,11 +12,7 @@ def extract_imports(tree: ast.AST) -> list[ast.stmt]:
 
     Returns a list of Import and ImportFrom nodes at module level only.
     """
-    return [
-        node
-        for node in tree.body
-        if isinstance(node, ast.Import | ast.ImportFrom)
-    ]
+    return [node for node in tree.body if isinstance(node, ast.Import | ast.ImportFrom)]
 
 
 def analyze_name_usage(node: ast.AST) -> set[str]:
@@ -134,9 +130,5 @@ def find_module_variables(tree: ast.AST) -> list[tuple[ast.stmt, str]]:
     for node in tree.body:
         if isinstance(node, ast.Assign):
             # Handle simple assignments like: variable = expression
-            variables.extend(
-                (node, target.id)
-                for target in node.targets
-                if isinstance(target, ast.Name)
-            )
+            variables.extend((node, target.id) for target in node.targets if isinstance(target, ast.Name))
     return variables

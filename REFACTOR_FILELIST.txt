@@ -1,0 +1,16 @@
+216	./llms.txt
+115	./LLM.txt
+14	./README.md
+12	./tests/test_pyxplod.py
+9	./src/pyxplod/processors.py
+8	./pyproject.toml
+7	./PLAN.md
+7	./GEMINI.md
+7	./CLAUDE.md
+7	./AGENTS.md
+5	./src/pyxplod/ast_utils.py
+5	./CHANGELOG.md
+4	./TODO.md
+4	./src/pyxplod/file_utils.py
+3	./AGENT.md
+3	./src/pyxplod/cli.py

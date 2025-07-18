@@ -62,4 +62,77 @@ fd -e py -x autoflake {}; fd -e py -x pyupgrade --py311-plus {}; fd -e py -x ruf
 ```
 
 Be creative, diligent, critical, relentless & funny!
+START SPECIFICATION:
+---
+description: Create overview documentation when analyzing unique business logic in video processing tools, particularly those focused on intelligent video overlay and synchronization with advanced frame alignment capabilities
+globs: *.py,*.md
+alwaysApply: false
+---
 
+
+# main-overview
+
+## Development Guidelines
+
+- Only modify code directly relevant to the specific request. Avoid changing unrelated functionality.
+- Never replace code with placeholders like `# ... rest of the processing ...`. Always include complete code.
+- Break problems into smaller steps. Think through each step separately before implementing.
+- Always provide a complete PLAN with REASONING based on evidence from code and logs before making changes.
+- Explain your OBSERVATIONS clearly, then provide REASONING to identify the exact issue. Add console logs when needed to gather more information.
+
+
+## Core Business Components
+
+### Frame Alignment Engine (Importance: 95)
+Handles the critical synchronization between foreground and background videos using:
+
+1. **Perceptual Frame Fingerprinting**
+- Creates unique fingerprints for video frames using multiple hash algorithms
+- Combines pHash, AverageHash, ColorMomentHash and MarrHildrethHash 
+- Enables ultra-fast frame comparison without pixel-level analysis
+
+2. **Spatial Alignment System**
+- Determines optimal x/y positioning of foreground video
+- Uses template matching with normalized cross-correlation
+- Handles automatic scaling when source sizes differ
+
+3. **Temporal Synchronization**  
+- Implements Dynamic Time Warping for frame-perfect alignment
+- Creates monotonic mapping between foreground and background frames
+- Prevents temporal drift through adaptive keyframe density
+
+### Video Composition Pipeline (Importance: 90)
+
+1. **Video Analysis Phase**
+- Extracts metadata from both video sources
+- Determines frame rates, durations, resolutions
+- Identifies available audio streams
+
+2. **Frame Matching Algorithm**  
+- Maps every foreground frame to optimal background frame
+- Maintains foreground timing integrity
+- Dynamically adapts background video timing
+
+3. **Audio Integration System**
+- Prioritizes foreground audio when available
+- Ensures synchronized audio/video alignment
+- Handles fallback to background audio
+
+### Operation Modes (Importance: 85)
+
+1. **Border Matching Mode**
+- Aligns content based on visible background edges
+- Uses configurable margin thickness
+- Optimizes edge detection for alignment
+
+2. **Smooth Blending Mode** 
+- Creates seamless visual transitions
+- Handles frame edge integration
+- Preserves content integrity during blending
+
+$END$
+END SPECIFICATION
+
+If you work with Python, use 'uv pip' instead of 'pip', and use 'uvx hatch test' instead of 'python -m pytest'. 
+
+When I say /report, you must: Read all `./TODO.md` and `./PLAN.md` files and analyze recent changes. Document all changes in `./CHANGELOG.md`. From `./TODO.md` and `./PLAN.md` remove things that are done. Make sure that `./PLAN.md` contains a detailed, clear plan that discusses specifics, while `./TODO.md` is its flat simplified itemized `- [ ]`-prefixed representation. When I say /work, you must work in iterations like so: Read all `./TODO.md` and `./PLAN.md` files and reflect. Work on the tasks. Think, contemplate, research, reflect, refine, revise. Be careful, curious, vigilant, energetic. Verify your changes. Think aloud. Consult, research, reflect. Then update `./PLAN.md` and `./TODO.md` with tasks that will lead to improving the work you’ve just done. Then '/report', and then iterate again.
