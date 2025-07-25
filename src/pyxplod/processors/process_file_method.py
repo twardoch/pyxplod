@@ -6,8 +6,8 @@ from pathlib import Path
 
 from loguru import logger
 
-from pyxplod.ast_utils import create_import_statement, extract_imports, find_definitions, find_module_variables
-from pyxplod.file_utils import generate_filename, write_extracted_file
+from pyxplod.ast_utils import create_import_statement, extract_imports, find_definitions, find_module_variables, find_module_constants, find_all_module_level_elements
+from pyxplod.file_utils import generate_filename, write_extracted_file, write_common_module
 
 
 def process_python_file(input_file: Path, output_base: Path, input_root: Path) -> None:
@@ -30,10 +30,12 @@ def process_python_file(input_file: Path, output_base: Path, input_root: Path) -
         logger.error(f"Error reading {input_file}: {e}")
         return
 
-    # Extract imports, definitions, and module variables
-    imports = extract_imports(tree)
-    definitions = find_definitions(tree)
-    module_variables = find_module_variables(tree)
+    # Extract all module-level elements
+    elements = find_all_module_level_elements(tree)
+    imports = elements['imports']
+    definitions = elements['definitions']
+    constants = elements['constants']
+    variables = elements['variables']
 
     if not definitions:
         # No definitions to extract, just copy the file
@@ -46,6 +48,29 @@ def process_python_file(input_file: Path, output_base: Path, input_root: Path) -
     existing_files: set[str] = set()
     base_name = input_file.stem
 
+    # Check if we need a common module (if we have imports, constants, or variables)
+    need_common_module = bool(imports or constants or variables)
+    common_module_name = ".common"  # Default value
+    
+    # Create common module if needed
+    common_elements = {
+        'imports': {imp for imp in imports},  # Store import nodes for reference
+        'constants': {name for _, name in constants},
+        'variables': {name for _, name in variables}
+    }
+    
+    if need_common_module:
+        common_path = output_dir / "common.py"
+        # Check if common.py already exists
+        if common_path.exists():
+            logger.warning(f"common.py already exists in {output_dir}, using alternative name")
+            common_path = output_dir / f"{base_name}_common.py"
+            # Update import module name
+            common_module_name = f".{base_name}_common"
+            
+        write_common_module(common_path, imports, constants, variables)
+        logger.info(f"Created common module: {common_path}")
+
     # Process each definition
     new_imports = []
 
@@ -57,22 +82,52 @@ def process_python_file(input_file: Path, output_base: Path, input_root: Path) -
 
                 # Write extracted file
                 extracted_path = output_dir / filename
-                write_extracted_file(extracted_path, imports.copy(), def_node, module_variables)
+                write_extracted_file(
+                    extracted_path, 
+                    imports.copy(), 
+                    def_node, 
+                    variables,  # Pass all variables, filtering happens inside
+                    use_common_module=need_common_module,
+                    common_elements=common_elements
+                )
 
                 # Create import statement
                 import_stmt = create_import_statement(f".{filename[:-3]}", def_name)
                 new_imports.append(import_stmt)
                 break
 
+    # For the main file, keep only non-definition, non-common elements
     current_remaining_body = []
     definition_nodes = {d[0] for d in definitions}
+    constant_nodes = {c[0] for c in constants}
+    variable_nodes = {v[0] for v in variables}
     import_nodes = set(imports)
+    
+    # If we have a common module, import from it
+    if need_common_module:
+        # Import * from common to get all imports, constants, and variables
+        common_import = ast.ImportFrom(
+            module=common_module_name[1:],  # Remove the leading dot for relative import
+            names=[ast.alias(name='*', asname=None)],
+            level=1  # Relative import
+        )
+        current_remaining_body.append(common_import)
 
     for node in tree.body:
-        if node not in definition_nodes and node not in import_nodes:
+        # Skip imports, definitions, constants, and variables (they're in common or extracted files)
+        if (node not in definition_nodes and 
+            node not in import_nodes and 
+            node not in constant_nodes and 
+            node not in variable_nodes):
             current_remaining_body.append(node)
 
-    modified_tree = ast.Module(body=imports + new_imports + current_remaining_body, type_ignores=tree.type_ignores)
+    # Build the modified main file
+    if need_common_module:
+        # Just the common import, new imports for definitions, and remaining body
+        modified_tree = ast.Module(body=new_imports + current_remaining_body, type_ignores=tree.type_ignores)
+    else:
+        # Original behavior when no common module is needed
+        modified_tree = ast.Module(body=imports + new_imports + current_remaining_body, type_ignores=tree.type_ignores)
 
     # Write the modified file
     output_file = output_base / relative_path
