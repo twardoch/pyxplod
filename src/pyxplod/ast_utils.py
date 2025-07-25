@@ -132,3 +132,43 @@ def find_module_variables(tree: ast.AST) -> list[tuple[ast.stmt, str]]:
             # Handle simple assignments like: variable = expression
             variables.extend((node, target.id) for target in node.targets if isinstance(target, ast.Name))
     return variables
+
+
+def find_module_constants(tree: ast.AST) -> list[tuple[ast.stmt, str]]:
+    """Find all module-level constants (uppercase variable assignments).
+
+    Returns list of tuples: (assignment_node, constant_name).
+    Constants are identified as module-level assignments to uppercase names.
+    """
+    constants: list[tuple[ast.stmt, str]] = []
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            # Check each target in the assignment
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id.isupper():
+                    constants.append((node, target.id))
+    return constants
+
+
+def find_all_module_level_elements(tree: ast.AST) -> dict[str, list]:
+    """Find all module-level elements that should go into common module.
+
+    Returns a dictionary with:
+    - 'imports': All import statements
+    - 'constants': Module-level uppercase assignments
+    - 'variables': Other module-level assignments
+    - 'definitions': Functions and classes
+    """
+    elements = {
+        'imports': extract_imports(tree),
+        'constants': find_module_constants(tree),
+        'variables': [],
+        'definitions': find_definitions(tree)
+    }
+    
+    # Separate variables from constants
+    all_variables = find_module_variables(tree)
+    constant_names = {name for _, name in elements['constants']}
+    elements['variables'] = [(node, name) for node, name in all_variables if name not in constant_names]
+    
+    return elements

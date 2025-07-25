@@ -3,6 +3,14 @@
 ## [Unreleased]
 
 ### Added
+- **Common Module Support** (2025-07-25): Added automatic creation of `common.py` module to preserve shared imports, constants, and variables
+  - Added `find_module_constants()` to detect module-level uppercase constants
+  - Added `find_all_module_level_elements()` to categorize all module-level elements
+  - Added `write_common_module()` to create a common module with shared elements
+  - Enhanced `write_extracted_file()` to import from common module when available
+  - Updated `process_python_file()` to create common.py and use it for imports
+  - Handles edge case when common.py already exists by using alternative name
+  - All extracted files now import from common module to access shared constants and imports
 - Implemented scope resolution for module-level variables in both `files` and `dirs` methods (2025-05-27)
   - Added `find_module_variables()` function to detect module-level assignments
   - Enhanced `write_extracted_file()` to include required module variables in extracted files
